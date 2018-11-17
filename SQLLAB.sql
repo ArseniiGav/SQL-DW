@@ -38,16 +38,23 @@ SELECT id as dep_id, sum from departament INNER JOIN (select departament_id, sum
 -- задание 4
 
 
-select DISTINCT departament_id, min(num_public) OVER (partition by departament_id) from employee group by (departament_id, num_public);
---departament_id | min 
-------------------+-----
---6 | 18
---1 | 1
---4 | 2
---2 | 10
---5 | 21
---3 | 8
---(6 rows)
+select name, min as min_count_public, id, name_men from departament
+       inner join (select name as name_men, min, dip from employee
+                   inner join(select distinct departament_id as dip, min(num_public) over (partition by departament_id) as min from employee
+                              GROUP by(departament_id, name, num_public)) 
+                   as foo on foo.min=employee.num_public and foo.dip=employee.departament_id)
+       as fo on fo.dip=departament.id;
+
+--name | min_count_public | id | name_men 
+--------------------+------------------+----+----------
+--Therapy | 1 | 1 | Alexey
+--Therapy | 1 | 1 | Klaudia
+--Neurology | 10 | 2 | Kate
+--Cardiology | 8 | 3 | Peter
+--Gastroenterology | 2 | 4 | Irina
+--Hematology | 21 | 5 | Sascha
+--Oncology | 18 | 6 | Ann
+--(7 rows)
 
 -- задание 5
 
